@@ -1,0 +1,42 @@
+RSS_SOURCES = [
+    {
+        "source_name": "EIA Today in Energy",
+        "source_type": "rss",
+        "base_url": "https://www.eia.gov",
+        "feed_url": "https://www.eia.gov/rss/todayinenergy.xml",
+        "domain_name": "eia.gov",
+        "topic_focus": "energy,oil_market,supply,demand",
+    },
+    {
+        "source_name": "EIA Press Releases",
+        "source_type": "rss",
+        "base_url": "https://www.eia.gov",
+        "feed_url": "https://www.eia.gov/rss/press_rss.xml",
+        "domain_name": "eia.gov",
+        "topic_focus": "energy,oil_market,supply,demand",
+    },
+    {
+        "source_name": "ECB Press Releases",
+        "source_type": "rss",
+        "base_url": "https://www.ecb.europa.eu",
+        "feed_url": "https://www.ecb.europa.eu/rss/press.html",
+        "domain_name": "ecb.europa.eu",
+        "topic_focus": "economy,tariffs,sanctions,macro",
+    },
+    {
+        "source_name": "ECB Blog",
+        "source_type": "rss",
+        "base_url": "https://www.ecb.europa.eu",
+        "feed_url": "https://www.ecb.europa.eu/rss/blog.html",
+        "domain_name": "ecb.europa.eu",
+        "topic_focus": "economy,macro,policy",
+    },
+    {
+        "source_name": "IMF News",
+        "source_type": "rss",
+        "base_url": "https://www.imf.org",
+        "feed_url": "https://www.imf.org/en/news/rss",
+        "domain_name": "imf.org",
+        "topic_focus": "economy,macro,sanctions,tariffs,geopolitics",
+    },
+]
