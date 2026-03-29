@@ -7,7 +7,7 @@ from src.db.connection import get_connection
 
 BENCHMARK_CODE = "BRENT"
 YAHOO_TICKER = "BZ=F"
-START_DATE = "2000-01-01"
+START_DATE = "2007-01-01"
 
 
 GET_SOURCE_ID_SQL = """
@@ -52,7 +52,6 @@ def to_python_value(value):
     if value is None:
         return None
 
-    # Handles pandas/numpy NaN without importing numpy directly
     try:
         if value != value:
             return None

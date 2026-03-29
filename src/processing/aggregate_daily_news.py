@@ -42,8 +42,7 @@ SELECT
     NOW(),
     NOW()
 FROM app.articles_raw ar
-JOIN app.articles_processed ap
-    ON ap.article_id = ar.article_id
+JOIN app.articles_processed ap ON ap.article_id = ar.article_id
 WHERE ap.processing_status = 'processed'
   AND ar.published_date IS NOT NULL
   AND COALESCE(ap.relevance_score, 0) > 0
@@ -78,10 +77,8 @@ SELECT
     NOW(),
     NOW()
 FROM app.articles_raw ar
-JOIN app.articles_processed ap
-    ON ap.article_id = ar.article_id
-JOIN app.article_topic_scores ats
-    ON ats.article_id = ar.article_id
+JOIN app.articles_processed ap ON ap.article_id = ar.article_id
+JOIN app.article_topic_scores ats ON ats.article_id = ar.article_id
 WHERE ap.processing_status = 'processed'
   AND ar.published_date IS NOT NULL
 GROUP BY ar.published_date, ats.topic_id

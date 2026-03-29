@@ -42,8 +42,7 @@ SELECT
     ar.content,
     ar.published_date
 FROM app.articles_raw ar
-JOIN app.articles_processed ap
-    ON ap.article_id = ar.article_id
+JOIN app.articles_processed ap ON ap.article_id = ar.article_id
 WHERE ap.processing_status = 'pending'
 ORDER BY ar.article_id;
 """
