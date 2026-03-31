@@ -160,4 +160,5 @@ Initial project structure created. At this stage (Phase A), the following have b
 - Data ingestion pipeline (oil prices & RSS feeds)
 - Article processing and sentiment analysis
 - Daily feature aggregation
+  
 Machine learning models and dashboard are planned for the next phase.
