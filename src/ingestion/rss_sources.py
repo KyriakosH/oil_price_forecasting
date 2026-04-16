@@ -39,4 +39,55 @@ RSS_SOURCES = [
         "domain_name": "imf.org",
         "topic_focus": "economy,macro,sanctions,tariffs,geopolitics",
     },
+
+    # Added official sources below
+
+    {
+        "source_name": "Federal Reserve All Press Releases",
+        "source_type": "rss",
+        "base_url": "https://www.federalreserve.gov",
+        "feed_url": "https://www.federalreserve.gov/feeds/press_all.xml",
+        "domain_name": "federalreserve.gov",
+        "topic_focus": "economy,macro,policy,interest_rates,financial_markets",
+    },
+    {
+        "source_name": "Federal Reserve Monetary Policy",
+        "source_type": "rss",
+        "base_url": "https://www.federalreserve.gov",
+        "feed_url": "https://www.federalreserve.gov/feeds/press_monetary.xml",
+        "domain_name": "federalreserve.gov",
+        "topic_focus": "economy,macro,policy,interest_rates,financial_markets",
+    },
+    {
+        "source_name": "Federal Reserve Balance Sheet",
+        "source_type": "rss",
+        "base_url": "https://www.federalreserve.gov",
+        "feed_url": "https://www.federalreserve.gov/feeds/clp.xml",
+        "domain_name": "federalreserve.gov",
+        "topic_focus": "economy,macro,liquidity,financial_markets,banking",
+    },
+    {
+        "source_name": "EU Sanctions Guidance",
+        "source_type": "rss",
+        "base_url": "https://finance.ec.europa.eu",
+        "feed_url": "https://finance.ec.europa.eu/node/1296/rss_en",
+        "domain_name": "finance.ec.europa.eu",
+        "topic_focus": "sanctions,tariffs,trade,geopolitics,energy",
+    },
+    {
+        "source_name": "EU Sanctions FAQs",
+        "source_type": "rss",
+        "base_url": "https://finance.ec.europa.eu",
+        "feed_url": "https://finance.ec.europa.eu/node/1068/rss_en",
+        "domain_name": "finance.ec.europa.eu",
+        "topic_focus": "sanctions,trade,geopolitics,energy,finance",
+    },
+    {
+        "source_name": "EU Sanctions Energy FAQs",
+        "source_type": "rss",
+        "base_url": "https://finance.ec.europa.eu",
+        "feed_url": "https://finance.ec.europa.eu/node/1068/rss_en?f%5B0%5D=sanctions_category_sanctions_category%3A154",
+        "domain_name": "finance.ec.europa.eu",
+        "topic_focus": "sanctions,energy,oil_market,geopolitics,trade",
+    },
 ]
