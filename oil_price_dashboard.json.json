@@ -5,8 +5,8 @@
     "name": "adxtrj7",
     "namespace": "default",
     "uid": "7f91d9c5-604e-4f44-9e00-5ab2b8870546",
-    "resourceVersion": "1777206537430004",
-    "generation": 16,
+    "resourceVersion": "1777208574185000",
+    "generation": 17,
     "creationTimestamp": "2026-04-26T08:53:49Z",
     "labels": {
       "grafana.app/deprecatedInternalID": "3690427660054528"
@@ -16,7 +16,7 @@
       "grafana.app/folder": "",
       "grafana.app/saved-from-ui": "Grafana v13.0.1 (a100054f21)",
       "grafana.app/updatedBy": "user:dfk8lsze3zhtsc",
-      "grafana.app/updatedTimestamp": "2026-04-26T12:28:57Z"
+      "grafana.app/updatedTimestamp": "2026-04-26T13:02:54Z"
     }
   },
   "spec": {
@@ -613,7 +613,7 @@
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 158
+                        "value": 109
                       }
                     ]
                   },
@@ -1198,7 +1198,7 @@
         "kind": "Panel",
         "spec": {
           "id": 9,
-          "title": "Articles Sorted by Sentiment Scorecles",
+          "title": "Articles Sorted by Sentiment Scores",
           "description": "",
           "links": [],
           "data": {
