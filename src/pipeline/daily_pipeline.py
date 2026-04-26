@@ -1,5 +1,5 @@
 from src.ingestion.oil_price_ingest import main as oil_price_ingest_main
-from src.ingestion.rss_ingest import main as rss_ingest_main
+from src.ingestion.ingest import main as rss_ingest_main
 from src.processing.article_processor import main as article_processor_main
 from src.processing.aggregate_daily_news import main as aggregate_daily_news_main
 from src.processing.build_model_features import build_model_features

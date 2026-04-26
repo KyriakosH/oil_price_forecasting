@@ -56,9 +56,16 @@ WITH brent_prices AS (
             ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
         ) AS rolling_volatility_7d,
 
-        LEAD(op.price_date, 1) OVER (
-            PARTITION BY op.benchmark_code
-            ORDER BY op.price_date
+        COALESCE(
+            LEAD(op.price_date, 1) OVER (
+                PARTITION BY op.benchmark_code
+                ORDER BY op.price_date
+            ),
+            CASE
+                WHEN EXTRACT(ISODOW FROM op.price_date) = 5 THEN (op.price_date + INTERVAL '3 day')::date
+                WHEN EXTRACT(ISODOW FROM op.price_date) = 6 THEN (op.price_date + INTERVAL '2 day')::date
+                ELSE (op.price_date + INTERVAL '1 day')::date
+            END
         ) AS target_date,
 
         LEAD(op.close_price, 1) OVER (
@@ -233,6 +240,7 @@ LATEST_SQL = """
 SELECT
     benchmark_code,
     feature_date,
+    target_date,
     close_price,
     return_1d,
     lag_close_1d,
@@ -261,6 +269,7 @@ def build_model_features() -> None:
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(UPSERT_SQL)
+
             cur.execute(COUNT_SQL)
             total_rows = cur.fetchone()[0]
 
