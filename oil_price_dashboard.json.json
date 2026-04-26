@@ -3,10 +3,21 @@
   "kind": "Dashboard",
   "metadata": {
     "name": "adxtrj7",
-    "generation": 24,
-    "creationTimestamp": "2026-04-22T08:03:51Z",
-    "labels": {},
-    "annotations": {}
+    "namespace": "default",
+    "uid": "7f91d9c5-604e-4f44-9e00-5ab2b8870546",
+    "resourceVersion": "1777206537430004",
+    "generation": 16,
+    "creationTimestamp": "2026-04-26T08:53:49Z",
+    "labels": {
+      "grafana.app/deprecatedInternalID": "3690427660054528"
+    },
+    "annotations": {
+      "grafana.app/createdBy": "user:dfk8lsze3zhtsc",
+      "grafana.app/folder": "",
+      "grafana.app/saved-from-ui": "Grafana v13.0.1 (a100054f21)",
+      "grafana.app/updatedBy": "user:dfk8lsze3zhtsc",
+      "grafana.app/updatedTimestamp": "2026-04-26T12:28:57Z"
+    }
   },
   "spec": {
     "annotations": [
@@ -17,10 +28,7 @@
             "kind": "DataQuery",
             "group": "grafana",
             "version": "v0",
-            "spec": {},
-            "labels": {
-              "grafana.app/export-label": "grafana-1"
-            }
+            "spec": {}
           },
           "enable": true,
           "hide": true,
@@ -51,6 +59,9 @@
                       "kind": "DataQuery",
                       "group": "grafana-postgresql-datasource",
                       "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
                       "spec": {
                         "dataset": "oil_price_forecasting",
                         "editorMode": "code",
@@ -74,9 +85,6 @@
                           ],
                           "limit": 50
                         }
-                      },
-                      "labels": {
-                        "grafana.app/export-label": "grafana-postgresql-datasource-1"
                       }
                     },
                     "refId": "A",
@@ -187,6 +195,9 @@
                       "kind": "DataQuery",
                       "group": "grafana-postgresql-datasource",
                       "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
                       "spec": {
                         "dataset": "oil_price_forecasting",
                         "editorMode": "code",
@@ -210,9 +221,6 @@
                           ],
                           "limit": 50
                         }
-                      },
-                      "labels": {
-                        "grafana.app/export-label": "grafana-postgresql-datasource-1"
                       }
                     },
                     "refId": "A",
@@ -374,6 +382,9 @@
                       "kind": "DataQuery",
                       "group": "grafana-postgresql-datasource",
                       "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
                       "spec": {
                         "dataset": "oil_price_forecasting",
                         "editorMode": "code",
@@ -397,9 +408,6 @@
                           ],
                           "limit": 50
                         }
-                      },
-                      "labels": {
-                        "grafana.app/export-label": "grafana-postgresql-datasource-1"
                       }
                     },
                     "refId": "A",
@@ -502,12 +510,15 @@
                       "kind": "DataQuery",
                       "group": "grafana-postgresql-datasource",
                       "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
                       "spec": {
                         "dataset": "oil_price_forecasting",
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "WITH latest_run AS (\r\n  SELECT model_run_id\r\n  FROM app.model_runs\r\n  WHERE model_name = '$model_name'\r\n    AND run_status = 'completed'\r\n  ORDER BY finished_at DESC NULLS LAST, model_run_id DESC\r\n  LIMIT 1\r\n),\r\nlatest_scored_pred AS (\r\n  SELECT\r\n    prediction_for_date,\r\n    predicted_close,\r\n    actual_close\r\n  FROM app.predictions\r\n  WHERE model_run_id = (SELECT model_run_id FROM latest_run)\r\n    AND actual_close IS NOT NULL\r\n  ORDER BY prediction_for_date DESC\r\n  LIMIT 1\r\n)\r\nSELECT\r\n  ROUND(predicted_close::numeric, 2) AS \"Predicted\",\r\n  ROUND(actual_close::numeric, 2) AS \"Actual\",\r\n  ROUND(ABS(predicted_close - actual_close)::numeric, 2) AS \"Error\",\r\n  TO_CHAR(prediction_for_date, 'YYYY-MM-DD') AS \"Date\"\r\nFROM latest_scored_pred;",
+                        "rawSql": "WITH latest_run AS (\r\n  SELECT model_run_id\r\n  FROM app.model_runs\r\n  WHERE model_name = '$model_name'\r\n    AND run_status = 'completed'\r\n  ORDER BY finished_at DESC NULLS LAST, model_run_id DESC\r\n  LIMIT 1\r\n),\r\nscored_preds AS (\r\n  SELECT\r\n    p.prediction_for_date,\r\n    p.feature_date,\r\n    p.predicted_close,\r\n    p.actual_close,\r\n    p.confidence_score,\r\n    prev.close_price AS previous_close\r\n  FROM app.predictions p\r\n  LEFT JOIN app.oil_prices prev\r\n    ON prev.price_date = p.feature_date\r\n   AND prev.benchmark_code = p.benchmark_code\r\n  WHERE p.model_run_id = (SELECT model_run_id FROM latest_run)\r\n    AND p.actual_close IS NOT NULL\r\n    AND p.predicted_close IS NOT NULL\r\n    AND prev.close_price IS NOT NULL\r\n)\r\nSELECT\r\n  TO_CHAR(prediction_for_date, 'YYYY-MM-DD') AS \"Date\",\r\n\r\n  ROUND(previous_close::numeric, 2) AS \"Previous Close\",\r\n  ROUND(predicted_close::numeric, 2) AS \"Predicted\",\r\n  ROUND(actual_close::numeric, 2) AS \"Actual\",\r\n  ROUND(ABS(predicted_close - actual_close)::numeric, 2) AS \"Price Error\",\r\n\r\n  ROUND(((predicted_close / NULLIF(previous_close, 0)) - 1)::numeric * 100, 2)\r\n    AS \"Predicted Return %\",\r\n\r\n  ROUND(((actual_close / NULLIF(previous_close, 0)) - 1)::numeric * 100, 2)\r\n    AS \"Actual Return %\",\r\n\r\n  CASE\r\n    WHEN predicted_close > previous_close THEN 'UP'\r\n    WHEN predicted_close < previous_close THEN 'DOWN'\r\n    ELSE 'FLAT'\r\n  END AS \"Predicted Direction\",\r\n\r\n  CASE\r\n    WHEN actual_close > previous_close THEN 'UP'\r\n    WHEN actual_close < previous_close THEN 'DOWN'\r\n    ELSE 'FLAT'\r\n  END AS \"Actual Direction\",\r\n\r\n  CASE\r\n    WHEN\r\n      CASE\r\n        WHEN predicted_close > previous_close THEN 1\r\n        WHEN predicted_close < previous_close THEN -1\r\n        ELSE 0\r\n      END\r\n      =\r\n      CASE\r\n        WHEN actual_close > previous_close THEN 1\r\n        WHEN actual_close < previous_close THEN -1\r\n        ELSE 0\r\n      END\r\n    THEN 'YES'\r\n    ELSE 'NO'\r\n  END AS \"Direction Correct\",\r\n\r\n  ROUND(\r\n    (\r\n      COALESCE(\r\n        confidence_score,\r\n        LEAST(\r\n          0.95,\r\n          GREATEST(\r\n            0.50,\r\n            0.50 + ABS((predicted_close / NULLIF(previous_close, 0)) - 1) * 10\r\n          )\r\n        )\r\n      ) * 100\r\n    )::numeric,\r\n    2\r\n  ) AS \"Confidence %\"\r\n\r\nFROM scored_preds\r\nORDER BY prediction_for_date DESC\r\nLIMIT 30;",
                         "sql": {
                           "columns": [
                             {
@@ -525,9 +536,245 @@
                           ],
                           "limit": 50
                         }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": [
+                  {
+                    "desc": true,
+                    "displayName": "Previous Close"
+                  }
+                ]
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
                       },
-                      "labels": {
-                        "grafana.app/export-label": "grafana-postgresql-datasource-1"
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "width": 100
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Direction Correct"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 130
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Confidence %"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 158
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Actual Return %"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 123
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Predicted Return %"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 145
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Previous Close"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 132
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Date"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 97
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Predicted"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 78
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Actual"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 56
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Price Error"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 85
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Predicted Direction"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 143
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Actual Direction"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 121
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "Evaluation Snapshot",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-postgresql-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
+                      "spec": {
+                        "dataset": "oil_price_forecasting",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT\r\n  ROUND(mae::numeric, 2) AS \"MAE\",\r\n  ROUND(rmse::numeric, 2) AS \"RMSE\"\r\nFROM app.model_runs\r\nWHERE model_name = '$model_name'\r\n  AND run_status = 'completed'\r\nORDER BY finished_at DESC NULLS LAST, model_run_id DESC\r\nLIMIT 1;",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
                       }
                     },
                     "refId": "A",
@@ -584,11 +831,11 @@
           }
         }
       },
-      "panel-5": {
+      "panel-6": {
         "kind": "Panel",
         "spec": {
-          "id": 5,
-          "title": "Evaluation Snapshot",
+          "id": 6,
+          "title": "Daily Sentiment Trend",
           "description": "",
           "links": [],
           "data": {
@@ -602,12 +849,15 @@
                       "kind": "DataQuery",
                       "group": "grafana-postgresql-datasource",
                       "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
                       "spec": {
                         "dataset": "oil_price_forecasting",
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "SELECT\r\n  ROUND(mae::numeric, 2) AS \"MAE\",\r\n  ROUND(rmse::numeric, 2) AS \"RMSE\"\r\nFROM app.model_runs\r\nWHERE model_name = '$model_name'\r\n  AND run_status = 'completed'\r\nORDER BY finished_at DESC NULLS LAST, model_run_id DESC\r\nLIMIT 1;",
+                        "rawSql": "WITH base AS (\r\n  SELECT\r\n    DATE(COALESCE(ar.published_date::timestamp, ar.published_at))::timestamp AS day,\r\n    ap.sentiment_score,\r\n    COALESCE(NULLIF(ap.relevance_score, 0), 1.0) AS weight\r\n  FROM app.articles_raw ar\r\n  JOIN app.articles_processed ap\r\n    ON ap.article_id = ar.article_id\r\n  JOIN app.sources s\r\n    ON s.source_id = ar.source_id\r\n  WHERE $__timeFilter(COALESCE(ar.published_date::timestamp, ar.published_at))\r\n    AND ap.sentiment_score IS NOT NULL\r\n    AND (\r\n      '$news_source' = '__all'\r\n      OR s.source_name = '$news_source'\r\n    )\r\n)\r\nSELECT\r\n  day AS time,\r\n  AVG(sentiment_score) AS avg_sentiment,\r\n  SUM(sentiment_score * weight) / NULLIF(SUM(weight), 0) AS weighted_sentiment\r\nFROM base\r\nGROUP BY day\r\nORDER BY day;",
                         "sql": {
                           "columns": [
                             {
@@ -625,9 +875,142 @@
                           ],
                           "limit": 50
                         }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
                       },
-                      "labels": {
-                        "grafana.app/export-label": "grafana-postgresql-datasource-1"
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "id": 7,
+          "title": "Daily Article Count",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-postgresql-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
+                      "spec": {
+                        "dataset": "oil_price_forecasting",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT\r\n  DATE(COALESCE(ar.published_date::timestamp, ar.published_at))::timestamp AS time,\r\n  COUNT(*) AS article_count,\r\n  AVG(ap.sentiment_score) AS avg_sentiment\r\nFROM app.articles_raw ar\r\nJOIN app.articles_processed ap\r\n  ON ap.article_id = ar.article_id\r\nJOIN app.sources s\r\n  ON s.source_id = ar.source_id\r\nWHERE $__timeFilter(COALESCE(ar.published_date::timestamp, ar.published_at))\r\n  AND ap.sentiment_score IS NOT NULL\r\n  AND (\r\n    '$news_source' = '__all'\r\n    OR s.source_name = '$news_source'\r\n  )\r\nGROUP BY time\r\nORDER BY time;",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
                       }
                     },
                     "refId": "A",
@@ -674,8 +1057,234 @@
                     "footer": {
                       "reducers": []
                     },
-                    "inspect": false,
-                    "width": 100
+                    "inspect": false
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "id": 8,
+          "title": "Article Count by News Source",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-postgresql-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
+                      "spec": {
+                        "dataset": "oil_price_forecasting",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT\r\n  s.source_name,\r\n  COUNT(*) AS article_count\r\nFROM app.articles_raw ar\r\nJOIN app.articles_processed ap\r\n  ON ap.article_id = ar.article_id\r\nJOIN app.sources s\r\n  ON s.source_id = ar.source_id\r\nWHERE $__timeFilter(COALESCE(ar.published_date::timestamp, ar.published_at))\r\n  AND (\r\n    '$news_source' = '__all'\r\n    OR s.source_name = '$news_source'\r\n  )\r\nGROUP BY s.source_name\r\nORDER BY article_count DESC;",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "barchart",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "barRadius": 0,
+                "barWidth": 0.97,
+                "fullHighlight": false,
+                "groupWidth": 0.7,
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "orientation": "auto",
+                "showValue": "auto",
+                "stacking": "none",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                },
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 0
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "fillOpacity": 80,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineWidth": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-9": {
+        "kind": "Panel",
+        "spec": {
+          "id": 9,
+          "title": "Articles Sorted by Sentiment Scorecles",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "grafana-postgresql-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "afk8m3iepca9se"
+                      },
+                      "spec": {
+                        "dataset": "oil_price_forecasting",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT\r\n  COALESCE(ar.published_date::timestamp, ar.published_at) AS published_time,\r\n  s.source_name,\r\n  ar.title,\r\n  ROUND(ap.sentiment_score::numeric, 3) AS sentiment_score,\r\n  ROUND(ap.relevance_score::numeric, 3) AS relevance_score,\r\n  ar.url\r\nFROM app.articles_raw ar\r\nJOIN app.articles_processed ap\r\n  ON ap.article_id = ar.article_id\r\nJOIN app.sources s\r\n  ON s.source_id = ar.source_id\r\nWHERE $__timeFilter(COALESCE(ar.published_date::timestamp, ar.published_at))\r\n  AND ap.sentiment_score IS NOT NULL\r\n  AND ap.sentiment_score <> 0\r\n  AND (\r\n    '$news_source' = '__all'\r\n    OR s.source_name = '$news_source'\r\n  )\r\nORDER BY ap.sentiment_score DESC\r\nLIMIT 100;",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "table",
+            "version": "13.0.1",
+            "spec": {
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
                   }
                 },
                 "overrides": []
@@ -686,71 +1295,149 @@
       }
     },
     "layout": {
-      "kind": "GridLayout",
+      "kind": "TabsLayout",
       "spec": {
-        "items": [
+        "tabs": [
           {
-            "kind": "GridLayoutItem",
+            "kind": "TabsLayoutTab",
             "spec": {
-              "x": 0,
-              "y": 0,
-              "width": 15,
-              "height": 7,
-              "element": {
-                "kind": "ElementReference",
-                "name": "panel-1"
+              "title": "Forecasting Overview",
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 15,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-1"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 15,
+                        "y": 0,
+                        "width": 9,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-2"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 7,
+                        "width": 24,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-3"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 14,
+                        "width": 17,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-4"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 17,
+                        "y": 14,
+                        "width": 7,
+                        "height": 6,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-5"
+                        }
+                      }
+                    }
+                  ]
+                }
               }
             }
           },
           {
-            "kind": "GridLayoutItem",
+            "kind": "TabsLayoutTab",
             "spec": {
-              "x": 15,
-              "y": 0,
-              "width": 9,
-              "height": 7,
-              "element": {
-                "kind": "ElementReference",
-                "name": "panel-2"
-              }
-            }
-          },
-          {
-            "kind": "GridLayoutItem",
-            "spec": {
-              "x": 0,
-              "y": 7,
-              "width": 15,
-              "height": 8,
-              "element": {
-                "kind": "ElementReference",
-                "name": "panel-3"
-              }
-            }
-          },
-          {
-            "kind": "GridLayoutItem",
-            "spec": {
-              "x": 15,
-              "y": 7,
-              "width": 9,
-              "height": 4,
-              "element": {
-                "kind": "ElementReference",
-                "name": "panel-5"
-              }
-            }
-          },
-          {
-            "kind": "GridLayoutItem",
-            "spec": {
-              "x": 15,
-              "y": 11,
-              "width": 9,
-              "height": 4,
-              "element": {
-                "kind": "ElementReference",
-                "name": "panel-4"
+              "title": "News & Sentiment Analysis",
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 24,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-6"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 8,
+                        "width": 10,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-7"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 10,
+                        "y": 8,
+                        "width": 14,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-9"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 16,
+                        "width": 24,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-8"
+                        }
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -781,7 +1468,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "Oil Price Forecasting Dashboard",
+    "title": "Daily Article Count",
     "variables": [
       {
         "kind": "QueryVariable",
@@ -799,6 +1486,9 @@
             "kind": "DataQuery",
             "group": "grafana-postgresql-datasource",
             "version": "v0",
+            "datasource": {
+              "name": "afk8m3iepca9se"
+            },
             "spec": {
               "dataset": "oil_price_forecasting",
               "editorMode": "code",
@@ -824,9 +1514,6 @@
                 ],
                 "limit": 50
               }
-            },
-            "labels": {
-              "grafana.app/export-label": "grafana-postgresql-datasource-1"
             }
           },
           "regex": "",
@@ -874,6 +1561,9 @@
             "kind": "DataQuery",
             "group": "grafana-postgresql-datasource",
             "version": "v0",
+            "datasource": {
+              "name": "afk8m3iepca9se"
+            },
             "spec": {
               "dataset": "oil_price_forecasting",
               "editorMode": "code",
@@ -899,9 +1589,6 @@
                 ],
                 "limit": 50
               }
-            },
-            "labels": {
-              "grafana.app/export-label": "grafana-postgresql-datasource-1"
             }
           },
           "regex": "",
