@@ -203,7 +203,7 @@ oil_price_forecasting/
 │       └── daily_pipeline.py
 │
 ├── dashboard-1777194551165.json
-├── oil_price_dashboard.json.json
+├── oil_price_dashboard.json
 ├── .env.example
 ├── requirements.txt
 └── README.md
@@ -561,7 +561,7 @@ Dashboard JSON files included in the repository:
 
 ```text
 dashboard-1777194551165.json
-oil_price_dashboard.json.json
+oil_price_dashboard.json
 ```
 
 Use the final dashboard JSON file that matches the submitted version of the project.
@@ -658,6 +658,12 @@ The current system has several limitations:
 - News may affect prices before or after publication dates.
 - The models are experimental and should not be used for trading decisions.
 - Forecasting short-term commodity prices is difficult because markets react to complex and fast-changing information.
+
+---
+
+## Possible Improvements
+
+Possible extensions of this project include using more advanced NLP models for sentiment analysis, adding macroeconomic indicators, improving news-price time alignment, and testing higher-frequency data.
 
 ---
 
