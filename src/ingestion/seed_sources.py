@@ -39,9 +39,6 @@ RSS_SOURCES = [
         "domain_name": "imf.org",
         "topic_focus": "economy,macro,sanctions,tariffs,geopolitics",
     },
-
-    # Added official sources below
-
     {
         "source_name": "Federal Reserve All Press Releases",
         "source_type": "rss",
@@ -91,3 +88,60 @@ RSS_SOURCES = [
         "topic_focus": "sanctions,energy,oil_market,geopolitics,trade",
     },
 ]
+
+
+API_SOURCES = [
+    {
+        "source_name": "Hacker News Oil Search",
+        "source_type": "api",
+        "base_url": "https://hn.algolia.com",
+        "feed_url": (
+            "https://hn.algolia.com/api/v1/search_by_date"
+            "?query=oil%20OR%20opec%20OR%20brent%20OR%20wti"
+            "&tags=story"
+            "&hitsPerPage=50"
+        ),
+        "domain_name": "hn.algolia.com",
+        "topic_focus": "social,technology,investor_discussion,oil_market",
+    },
+    {
+        "source_name": "Hacker News Energy Search",
+        "source_type": "api",
+        "base_url": "https://hn.algolia.com",
+        "feed_url": (
+            "https://hn.algolia.com/api/v1/search_by_date"
+            "?query=energy%20prices%20OR%20oil%20market%20OR%20crude"
+            "&tags=story"
+            "&hitsPerPage=50"
+        ),
+        "domain_name": "hn.algolia.com",
+        "topic_focus": "social,technology,energy,oil_market",
+    },
+    {
+        "source_name": "Mastodon Oil Hashtag",
+        "source_type": "api",
+        "base_url": "https://mastodon.social",
+        "feed_url": "https://mastodon.social/api/v1/timelines/tag/oil?limit=40",
+        "domain_name": "mastodon.social",
+        "topic_focus": "social,oil_market,public_posts",
+    },
+    {
+        "source_name": "Mastodon Energy Hashtag",
+        "source_type": "api",
+        "base_url": "https://mastodon.social",
+        "feed_url": "https://mastodon.social/api/v1/timelines/tag/energy?limit=40",
+        "domain_name": "mastodon.social",
+        "topic_focus": "social,energy,public_posts",
+    },
+    {
+        "source_name": "Mastodon OPEC Hashtag",
+        "source_type": "api",
+        "base_url": "https://mastodon.social",
+        "feed_url": "https://mastodon.social/api/v1/timelines/tag/opec?limit=40",
+        "domain_name": "mastodon.social",
+        "topic_focus": "social,opec,oil_market,public_posts",
+    },
+]
+
+
+ALL_SOURCES = RSS_SOURCES + API_SOURCES
