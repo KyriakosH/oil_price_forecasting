@@ -203,7 +203,7 @@ oil_price_forecasting/
 │       └── daily_pipeline.py
 │
 ├── dashboard-1777194551165.json
-├── oil_price_dashboard.json
+├── oil_price_dashboard.json.json
 ├── .env.example
 ├── requirements.txt
 └── README.md
@@ -561,7 +561,7 @@ Dashboard JSON files included in the repository:
 
 ```text
 dashboard-1777194551165.json
-oil_price_dashboard.json
+oil_price_dashboard.json.json
 ```
 
 Use the final dashboard JSON file that matches the submitted version of the project.
