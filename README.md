@@ -693,6 +693,10 @@ https://github.com/KyriakosH/oil_price_forecasting
 ---
 
 ## Authors
+Demetra Kerkidou
+Panayiota Efstathhiou
+Stylianos Kestoras
+Kyriakos Hadjiandreou
 
 CSE 473/525 Data Science Group Project
 
