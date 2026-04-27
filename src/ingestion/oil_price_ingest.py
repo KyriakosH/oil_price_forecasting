@@ -78,7 +78,7 @@ def fetch_brent_history():
     if df.empty:
         raise RuntimeError("No data returned from Yahoo Finance.")
 
-    # Flatten MultiIndex columns if present
+
     if hasattr(df.columns, "nlevels") and df.columns.nlevels > 1:
         df.columns = df.columns.get_level_values(0)
 

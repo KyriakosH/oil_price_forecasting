@@ -364,7 +364,6 @@ def main() -> None:
     df = load_features()
     feature_cols = get_feature_columns()
 
-    # Rows usable for training/testing must have known targets.
     labelled_df = df.dropna(
         subset=feature_cols
         + [
@@ -374,7 +373,7 @@ def main() -> None:
         ]
     ).copy()
 
-    # Latest row can have no target, because this is the row we use to predict tomorrow.
+
     live_candidates = df.dropna(subset=feature_cols + ["close_price"]).copy()
 
     if len(labelled_df) < 50:

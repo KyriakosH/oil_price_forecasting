@@ -133,9 +133,7 @@ def insert_article(
     return False
 
 
-# ============================================================
 # RSS ingestion
-# ============================================================
 
 def parse_entry_datetime(entry) -> datetime | None:
     for key in ("published_parsed", "updated_parsed"):
@@ -244,9 +242,7 @@ def ingest_rss_feed(cur, source_id: int, source_name: str, feed_url: str) -> tup
     return inserted_count, skipped_count
 
 
-# ============================================================
 # API helpers
-# ============================================================
 
 def fetch_json(url: str) -> dict[str, Any] | list[Any] | None:
     try:
@@ -276,9 +272,8 @@ def fetch_json(url: str) -> dict[str, Any] | list[Any] | None:
         return None
 
 
-# ============================================================
+
 # Hacker News ingestion
-# ============================================================
 
 def ingest_hacker_news(cur, source_id: int, source_name: str, feed_url: str) -> tuple[int, int]:
     print(f"\nFetching Hacker News API: {source_name}")
@@ -357,9 +352,7 @@ def ingest_hacker_news(cur, source_id: int, source_name: str, feed_url: str) -> 
     return inserted_count, skipped_count
 
 
-# ============================================================
 # Mastodon ingestion
-# ============================================================
 
 def ingest_mastodon(cur, source_id: int, source_name: str, feed_url: str) -> tuple[int, int]:
     print(f"\nFetching Mastodon API: {source_name}")
@@ -433,9 +426,7 @@ def ingest_mastodon(cur, source_id: int, source_name: str, feed_url: str) -> tup
     return inserted_count, skipped_count
 
 
-# ============================================================
 # Source router
-# ============================================================
 
 def ingest_source(
     cur,
